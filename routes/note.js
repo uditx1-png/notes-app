@@ -3,7 +3,7 @@ const router = express.Router();
 const Note = require("../models/Note");
 const auth = require("../middleware/auth");
 
-// ➤ Create Note
+// ➤ CREATE NOTE
 router.post("/", auth, async (req, res) => {
   try {
     const note = new Note({
@@ -15,26 +15,31 @@ router.post("/", auth, async (req, res) => {
     await note.save();
 
     res.json({ message: "Note created", note });
+
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ➤ Get All Notes (only logged-in user)
+// ➤ GET NOTES
 router.get("/", auth, async (req, res) => {
   try {
     const notes = await Note.find({ userId: req.user.userId });
     res.json(notes);
+
   } catch (err) {
+    console.log(err);   // 🔥 IMPORTANT (see error in console)
     res.status(500).json({ error: err.message });
   }
 });
 
-// ➤ Delete Note
+// ➤ DELETE NOTE
 router.delete("/:id", auth, async (req, res) => {
   try {
     await Note.findByIdAndDelete(req.params.id);
     res.json({ message: "Note deleted" });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
