@@ -34,12 +34,27 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
+// ➤ UPDATE NOTE
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      { title: req.body.title, content: req.body.content },
+      { new: true }
+    );
+    if (!note) return res.status(404).json({ error: "Note not found" });
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ➤ DELETE NOTE
 router.delete("/:id", auth, async (req, res) => {
   try {
-    await Note.findByIdAndDelete(req.params.id);
+    const note = await Note.findOneAndDelete({ _id: req.params.id, userId: req.user.userId });
+    if (!note) return res.status(404).json({ error: "Note not found" });
     res.json({ message: "Note deleted" });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
